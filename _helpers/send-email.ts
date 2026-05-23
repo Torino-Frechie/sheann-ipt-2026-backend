@@ -1,7 +1,7 @@
 export default async function sendEmail({ to, subject, html }: any) {
     const payload = {
         from: 'onboarding@resend.dev',
-        to: 'frechieannt@gmail.com',
+        to: to, // Use the 'to' parameter for the recipient
         subject: subject,
         html: html,
     };
