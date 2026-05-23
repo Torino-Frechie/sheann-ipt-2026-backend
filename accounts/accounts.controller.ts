@@ -168,7 +168,7 @@ function getAll(req: any, res: any, next: any) {
 }
 
 function getById(req: any, res: any, next: any) {
-    if (Number(req.params.id) !== req.user.id && req.user.role !== Role.Admin) {
+    if (req.params.id.toString() !== req.user.id.toString() && req.user.role !== Role.Admin) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     accountService
@@ -216,7 +216,7 @@ function updateSchema(req: any, res: any, next: any) {
 }
 
 function update(req: any, res: any, next: any) {
-    if (Number(req.params.id) !== req.user.id && req.user.role !== Role.Admin) {
+    if (req.params.id.toString() !== req.user.id.toString() && req.user.role !== Role.Admin) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     accountService
@@ -226,7 +226,7 @@ function update(req: any, res: any, next: any) {
 }
 
 function _delete(req: any, res: any, next: any) {
-    if (Number(req.params.id) !== req.user.id && req.user.role !== Role.Admin) {
+    if (req.params.id.toString() !== req.user.id.toString() && req.user.role !== Role.Admin) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     accountService
