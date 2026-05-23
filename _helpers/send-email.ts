@@ -1,12 +1,9 @@
 export default async function sendEmail({ to, subject, html }: any) {
-    const authorizedEmail = 'frechieannt@gmail.com';
-    const modifiedHtml = `<p><strong>Note:</strong> This message was intended for: ${to}</p><hr>${html}`;
-
     const payload = {
         from: 'onboarding@resend.dev',
-        to: 'frechieannt@gmail.com',
-        subject: `[TEST] ${subject}`,
-        html: modifiedHtml,
+        to: 'frechieannt@gmail.com', // Ensuring it always goes to your Gmail for testing
+        subject: subject,
+        html: html,
     };
 
     console.log('Sending email payload:', JSON.stringify(payload));
