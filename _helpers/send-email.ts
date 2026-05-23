@@ -1,7 +1,7 @@
 export default async function sendEmail({ to, subject, html }: any) {
     const payload = {
         from: 'onboarding@resend.dev',
-        to: 'frechieannt@gmail.com', // Ensuring it always goes to your Gmail for testing
+        to: 'frechieannt@gmail.com',
         subject: subject,
         html: html,
     };
