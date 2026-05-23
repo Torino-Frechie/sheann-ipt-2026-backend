@@ -11,17 +11,21 @@ initialize();
 
 async function initialize() {
     try {
-        const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSL } = process.env;
+        const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSL, NODE_ENV } = process.env;
         const host = DB_HOST || 'localhost';
         const port = DB_PORT ? parseInt(DB_PORT) : 3306;
         const user = DB_USER || 'root';
         const password = DB_PASSWORD || '';
         const database = DB_NAME || 'node_mysql_api';
 
-        // SSL is often not required for local development
-        const sslConfig = DB_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {};
+        // SSL configuration (often required for cloud DBs like Aiven/DigitalOcean, but not for XAMPP/Local)
+        const sslConfig = DB_SSL === 'true' ? { 
+            ssl: { rejectUnauthorized: false } 
+        } : (NODE_ENV === 'production' ? { ssl: { rejectUnauthorized: false } } : {});
 
-        // Create database if it doesn't already exist
+        console.log(`Connecting to database: ${database} at ${host}:${port}...`);
+
+        // 1. Create database if it doesn't already exist
         const connection = await mysql.createConnection({ 
             host, 
             port, 
@@ -32,19 +36,21 @@ async function initialize() {
         await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
         await connection.end();
 
-        // Connect to the database
+        // 2. Connect to the database with Sequelize
         const sequelize = new Sequelize(database, user, password, { 
             dialect: 'mysql',
             host,
             port,
-            dialectOptions: sslConfig
+            dialectOptions: sslConfig,
+            logging: false // Set to console.log to see SQL queries
         });
 
-        // Initialize models and add them to the exported db object
+        // 3. Initialize models and add them to the exported db object
+        // We do this immediately so they are available to services
         db.Account = accountModel(sequelize);
         db.RefreshToken = refreshTokenModel(sequelize);
 
-        // Define relationships
+        // 4. Define relationships
         db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
         db.RefreshToken.belongsTo(db.Account);
 
