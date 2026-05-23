@@ -11,11 +11,15 @@ initialize();
 
 async function initialize() {
     try {
-        const host = process.env.DB_HOST || 'localhost';
-        const port = process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306;
-        const user = process.env.DB_USER || 'root';
-        const password = process.env.DB_PASSWORD || '';
-        const database = process.env.DB_NAME || 'node_mysql_api';
+        const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSL } = process.env;
+        const host = DB_HOST || 'localhost';
+        const port = DB_PORT ? parseInt(DB_PORT) : 3306;
+        const user = DB_USER || 'root';
+        const password = DB_PASSWORD || '';
+        const database = DB_NAME || 'node_mysql_api';
+
+        // SSL is often not required for local development
+        const sslConfig = DB_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {};
 
         // Create database if it doesn't already exist
         const connection = await mysql.createConnection({ 
@@ -23,7 +27,7 @@ async function initialize() {
             port, 
             user, 
             password,
-            ssl: { rejectUnauthorized: false } 
+            ...sslConfig
         });
         await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
         await connection.end();
@@ -33,11 +37,7 @@ async function initialize() {
             dialect: 'mysql',
             host,
             port,
-            dialectOptions: {
-                ssl: {
-                    rejectUnauthorized: false
-                }
-            }
+            dialectOptions: sslConfig
         });
 
         // Initialize models and add them to the exported db object
