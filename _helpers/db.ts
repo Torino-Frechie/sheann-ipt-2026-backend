@@ -25,7 +25,6 @@ async function initialize() {
 
         console.log(`Connecting to database: ${database} at ${host}:${port}...`);
 
-        // 1. Create database if it doesn't already exist
         const connection = await mysql.createConnection({ 
             host, 
             port, 
@@ -36,25 +35,22 @@ async function initialize() {
         await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
         await connection.end();
 
-        // 2. Connect to the database with Sequelize
         const sequelize = new Sequelize(database, user, password, { 
             dialect: 'mysql',
             host,
             port,
             dialectOptions: sslConfig,
-            logging: false // Set to console.log to see SQL queries
+            logging: false 
         });
 
-        // 3. Initialize models and add them to the exported db object
-        // We do this immediately so they are available to services
-        db.Account = accountModel(sequelize);
+
+        db.account = accountModel(sequelize);
         db.RefreshToken = refreshTokenModel(sequelize);
 
-        // 4. Define relationships
-        db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
-        db.RefreshToken.belongsTo(db.Account);
+     
+        db.account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
+        db.RefreshToken.belongsTo(db.account);
 
-        // Sync all models with database
         await sequelize.sync({ alter: true });
         console.log('Database initialized successfully.');
     } catch (error) {

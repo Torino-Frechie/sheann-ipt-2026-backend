@@ -28,7 +28,7 @@ export default function model(sequelize: any) {
     };
 
     const options = {
-        tableName: 'Accounts',
+        tableName: 'accounts',
         freezeTableName: true,
         timestamps: false,
         defaultScope: { attributes: { exclude: ['passwordHash'] } },
