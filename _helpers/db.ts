@@ -1,5 +1,4 @@
 import 'mysql2'; // Force Vercel to bundle mysql2 for Sequelize
-import mysql from 'mysql2/promise';
 import { Sequelize } from 'sequelize';
 import accountModel from '../accounts/account.model';
 import refreshTokenModel from '../accounts/refresh-token.model';
@@ -19,23 +18,13 @@ async function initialize() {
         const database = DB_NAME || 'node_mysql_api';
 
         // SSL configuration (often required for cloud DBs like Aiven/DigitalOcean, but not for XAMPP/Local)
-        const sslConfig = DB_SSL === 'true' ? { 
+        const sslConfig = NODE_ENV === 'production' ? { 
             ssl: { rejectUnauthorized: false } 
-        } : (NODE_ENV === 'production' ? { ssl: { rejectUnauthorized: false } } : {});
-
+        } : {};
+        
         console.log(`Connecting to database: ${database} at ${host}:${port}...`);
 
-        const connection = await mysql.createConnection({ 
-            host, 
-            port, 
-            user, 
-            password,
-            ...sslConfig
-        });
-        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-        await connection.end();
-
-        const sequelize = new Sequelize(database, user, password, { 
+        const sequelize = new Sequelize(database, user, password, {
             dialect: 'mysql',
             host,
             port,
