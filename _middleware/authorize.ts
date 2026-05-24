@@ -6,7 +6,7 @@ export default function authorize(roles: any = []) {
     }
     return [
         (req: any, res: any, next: any) => {
-            const secret = process.env.SECRET;
+            const secret = process.env.JWT_SECRET;
             if (!secret) {
                 console.error("JWT Secret is missing!");
                 return res.status(500).json({ message: "Internal server error" });
